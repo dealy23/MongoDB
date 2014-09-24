@@ -36,10 +36,10 @@ app.get('/times', function(req, res){
 });
 
 app.delete('/time', function(req, res){
-
-    db.times.remove(req.body, function(err, document1){
-      res.send(document1);
-
+    var id = db.ObjectId(req.body._id);
+    db.times.remove({_id:id}, function(err, data){
+      if(err) { throw err; }
+      res.send(data);
   })
 });
 
