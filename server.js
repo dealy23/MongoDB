@@ -36,12 +36,18 @@ app.get('/times', function(req, res){
 });
 
 app.delete('/time', function(req, res){
-    var id = db.ObjectId(req.body._id);
-    db.times.remove({_id:id}, function(err, data){
-      if(err) { throw err; }
-      res.send(data);
+  var id = db.ObjectId(req.body._id);
+  db.times.remove({_id:id}, function(err, data){
+    if(err) { throw err; }
+    res.send(data);
   })
 });
+
+//app.put('/time', function (req, res){
+//  var id = db.ObjectID(req.body._id);
+//  db.times.update({_id:id}, function(err, data){
+//  })
+//})
 
 var server = app.listen(3000, function() {
   console.log('Listening on port %d', server.address().port);
