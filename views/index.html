@@ -9,15 +9,39 @@
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 </head>
 <body>
-  <form id="time-form" class="form-inline" role="form">
-    <input type="date" class="form-control" id="date" placeholder="Date">
-    <input type="time" class="form-control" id="from" placeholder="From">
-    <input type="time" class="form-control" id="to" placeholder="To">
-    <input type="time" class="form-control" id="lunch" placeholder="Lunch">
-    <input type="hidden" class="form-control" id="id" >
-    <button id="reset" type="reset" class="btn btn-warning">Reset</button>
-    <button id="submit" type="button" class="btn btn-primary">Submit</button>
-  </form>
-  <table class="table" id="timetable"></table>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Felix Hartmann</h1>
+    </div>
+    <table class="table" id="timetable">
+      <tr>
+        <form id="time-form" role="form">
+          <td>
+            <div class="form-group">
+              <input type="date" class="form-control" id="date" required="true" placeholder="Date">
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <input type="time" class="form-control" id="from" required="true" placeholder="From">
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <input type="time" class="form-control" id="to" required="true" placeholder="To">
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <input type="time" class="form-control" id="lunch" required="true" placeholder="Lunch">
+            </div>
+          </td>
+          <input type="hidden" class="form-control" id="id" >
+          <td><button id="reset" type="reset" class="btn btn-warning"><span class="glyphicon glyphicon-remove-sign"></span></button></td>
+          <td><button id="submit" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span></button></td>
+        </form>
+      </tr>
+    </table>
+  </div>
 </body>
 </html>

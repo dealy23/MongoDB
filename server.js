@@ -43,12 +43,21 @@ app.delete('/time', function(req, res){
   })
 });
 
-//app.put('/time', function (req, res){
-//  var id = db.ObjectID(req.body._id);
-//  db.times.update({_id:id}, function(err, data){
-//  })
-//})
+app.put('/time', function (req, res){
+  var id = db.ObjectId(req.body._id);
+  var up_date = req.body.date;
+  var up_from = req.body.from;
+  var up_to = req.body.to;
+  var up_lunch = req.body.lunch;
+
+  db.times.update({_id:id},{$set:{date:up_date, from:up_from, to:up_to, lunch:up_lunch}}, function(err, data){
+    if( err || !data ) console.log("not updated");
+    res.send(data);
+  })
+})
 
 var server = app.listen(3000, function() {
   console.log('Listening on port %d', server.address().port);
 });
+
+
