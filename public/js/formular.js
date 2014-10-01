@@ -1,49 +1,14 @@
 $(function() {
 
-  // Bei reload -> felder entleeren
+  get_times("GET");
+
   var d = new Date();
 
   $("#id").val("");
   $("#date").val(d.getDate()+"."+ (d.getMonth()+1) +"."+ d.getFullYear());
   $("#from").val(d.getHours()+":"+ d.getMinutes());
   $("#to").val((d.getHours()+9)+":"+ d.getMinutes());
-  $("#lunch").val("");
-
-  $("#date").on("keyup", function() {
-    if(isDate($(this).val())) {
-      console.log("is a date");
-      $(this).parent().removeClass("has-error");
-      $("#submit").attr("disabled", false);
-    } else {
-      $(this).parent().addClass("has-error");
-      $("#submit").attr("disabled", true);
-      console.log("is not a date");
-    }
-  })
-
-  $("#from").on("keyup", function(){
-    if(isTime($(this).val())) {
-      $(this).parent().removeClass("has-errro");
-      $("#submit").attr("disabled", false);
-    }else{
-      $(this).parent().addClass("has-error");
-      $("#submit").attr("disabled", true);
-    }
-  })
-
-  //Ausgabe gespeicherte Daten
-  $.ajax({
-    type: "GET",
-    url: "times",
-    success : function(data, status) {
-      for (i=0; i<data.length; i++) {
-        $("#timetable").append("<tr id="+ data[i]._id+"><td>" + data[i].date +  "</td><td>" + data[i].from + "</td><td>" + data[i].to + "</td><td>" + data[i].lunch +
-          "</td><td><button type='button' class='btn btn-primary update'><span class='glyphicon glyphicon-pencil'></span></button></td><td>" +
-          "<button type='button' class='btn btn-primary delete'><span class='glyphicon glyphicon-trash'></span></button></td>" + "</tr>")
-      }
-    }
-  });
-
+  $("#lunch").val("30");
 
   //Löschen des Datensatz incl löschen aus dem DOM
   $("#timetable").on( "click", ".delete", function(){
@@ -54,8 +19,9 @@ $(function() {
       data: {
         _id: iddelete
       },
-      success: function (document1, status, button) {
-        $("#"+iddelete).remove()
+      success: function () {
+        $("#"+iddelete).remove();
+        get_times("DELETE");
       }
     })
   });
@@ -109,15 +75,16 @@ $(function() {
             "</td><td><button type='button' class='btn btn-primary update'><span class='glyphicon glyphicon-pencil'></span></button></td><td>" +
             "<button type='button' class='btn btn-primary delete'><span class='glyphicon glyphicon-trash'></span></button></td>");
 
+            get_times("PUT");
             $("#id").val("");
             $("#date").val(d.getDate()+"."+ (d.getMonth()+1) +"."+ d.getFullYear());
             $("#from").val(d.getHours()+":"+ d.getMinutes());
             $("#to").val((d.getHours()+9)+":"+ d.getMinutes());
-            $("#lunch").val("");
+            $("#lunch").val("30");
             $("#submit").text('Submit');
           }
         })
-
+        //Ansonsten neuer post(einfügen)
       } else if($("#date").val() && $("#from").val() && $("#to").val()){
         $.ajax({
           type: "POST",
@@ -134,10 +101,11 @@ $(function() {
               "</td><td><button type='button' class='btn btn-primary update'><span class='glyphicon glyphicon-pencil'></span></button></td><td>" +
               "<button type='button' class='btn btn-primary delete'><span class='glyphicon glyphicon-trash'></span></button></td>" + "</tr>");
 
+            get_times("POST");
             $("#date").val(d.getDate()+"."+ (d.getMonth()+1) +"."+ d.getFullYear());
             $("#from").val(d.getHours()+":"+ d.getMinutes());
             $("#to").val((d.getHours()+9)+":"+ d.getMinutes());
-            $("#lunch").val("");
+            $("#lunch").val("30");
           }
         });
       } else{
@@ -145,61 +113,51 @@ $(function() {
       }
     }
   )
-
-  function isDate(txtDate) {
-    var currVal = txtDate;
-    if(currVal == '')
-      return false;
-
-    //Declare Regex
-    var rxDatePattern = /^(\d{1,2})(.|-)(\d{1,2})(.|-)(\d{4})$/;
-    var dtArray = currVal.match(rxDatePattern); // is format OK?
-
-    if (dtArray == null)
-      return false;
-
-    //Checks for dd/mm/yyyy format.
-    dtDay = dtArray[1];
-    dtMonth= dtArray[3];
-    dtYear = dtArray[5];
-
-    if (dtMonth < 1 || dtMonth > 12)
-      return false;
-    else if (dtDay < 1 || dtDay> 31)
-      return false;
-    else if ((dtMonth==4 || dtMonth==6 || dtMonth==9 || dtMonth==11) && dtDay ==31)
-      return false;
-    else if (dtMonth == 2)
-    {
-      var isleap = (dtYear % 4 == 0 && (dtYear % 100 != 0 || dtYear % 400 == 0));
-      if (dtDay> 29 || (dtDay ==29 && !isleap))
-        return false;
-    }
-    return true;
-  }
-
-  function isTime(txtTime) {
-    var currVal = txtTime;
-    if(currVal == '')
-      return false;
-
-    var rxTimePattern = /^(\t{1,2})(:)(\t{1,2})$/;
-    var dtArray = currVal.match(rxTimePattern);
-
-    dtHours = dtArray[1];
-    dtMinutes = dtArray[3];
-
-    if (dtHours < 0 || dtHours > 24 )
-      return false;
-    else if (dtMinutes < 0 || dtMinutes > 59)
-      return false;
-
-    return true;
-
-  }
-
 });
 
+//Ausgabe gespeicherte Daten
+function get_times(type) {
+  $.ajax({
+    type: "GET",
+    url: "times",
+    success: function (data, status) {
+      if(type == "GET") {
+        fill_table(data);
+      }
+      generate_balance(data);
+    }
+  });
+}
 
+function fill_table(data) {
+  for (i = 0; i < data.length; i++) {
+    $("#timetable").append("<tr id=" + data[i]._id + "><td>" + data[i].date + "</td><td>" + data[i].from + "</td><td>" + data[i].to + "</td><td>" + data[i].lunch +
+      "</td><td><button type='button' class='btn btn-primary update'><span class='glyphicon glyphicon-pencil'></span></button></td><td>" +
+      "<button type='button' class='btn btn-primary delete'><span class='glyphicon glyphicon-trash'></span></button></td>" + "</tr>")
+  }
+};
 
+//Zusammenrechnen für Gesamtstunden
+function generate_balance(data) {
+  var tohour = 0, tomin = 0, fromhour = 0, frommin = 0, lunchmin = 0;
+  for (i=0; i<data.length; i++) {
+    tohour += parseInt(data[i].to.match(/\d{1,2}/));
+    tomin += parseInt(data[i].to.match(/(\d+)(?!.*\d)/));
+    fromhour += parseInt(data[i].from.match(/\d{1,2}/));
+    frommin += parseInt(data[i].from.match(/(\d+)(?!.*\d)/));
+    lunchmin += parseInt(data[i].lunch);
 
+  }
+  var togesamt = ((tohour*60)+tomin);
+  var fromgesamt = ((fromhour*60)+frommin);
+  var sollzeit = data.length * 8 * 60;
+
+  var gesamtminuten= (togesamt - fromgesamt - lunchmin - sollzeit);
+
+  var hour = Math.floor(gesamtminuten%3600/60);
+  var minute = Math.floor(gesamtminuten%60);
+
+  var zeit = (hour+ ":"+ minute );
+
+  $("h3").html("Balance: "+zeit);
+}

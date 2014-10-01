@@ -1,6 +1,6 @@
 {
   "name": "MongoDB",
-  "description": "Insert Data into MongoDB",
+  "description": "Insert and read Data from MongoDB",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
